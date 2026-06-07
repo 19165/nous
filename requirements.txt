@@ -1,0 +1,7 @@
+discord.py
+langgraph
+langchain
+langchain-community
+langchain-openai
+langchain-tavily
+python-dotenv
