@@ -4,6 +4,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
