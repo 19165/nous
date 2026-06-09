@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 llm = ChatOllama(model="gemma4:31b-cloud")
 
 
+# IMPORTANT!!!
+# ปรับ planner_node ให้ส่ง output แบบ "structured output" เพื่อที่ "researcher_node" สามารถนำ plan (output ก่อนหน้า) มาใช้ได้
 def planner_node(state: AgentState):
     """
     Analyzes the user query and generates a research plan.
