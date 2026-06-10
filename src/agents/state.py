@@ -5,7 +5,7 @@ class AgentState(TypedDict):
     Represents the shared workflow state for the Discord Research Assistant.
     """
     query: str
-    plan: Optional[str]
+    plan: Optional[dict]
     findings: List[str]
     reviewed_findings: List[str]
     summary: Optional[str]
