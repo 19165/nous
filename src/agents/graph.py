@@ -1,22 +1,38 @@
 import logging
 from langgraph.graph import StateGraph, START, END
+from langchain_ollama import ChatOllama
 from src.agents.state import AgentState
-from src.agents.nodes import planner_node, researcher_node, reviewer_node, writer_node
+from src.agents.nodes import PlannerNode, ResearcherNode, ReviewerNode, WriterNode
+from src.tools.search import get_web_search_tool, get_news_search_tool
 
 logger = logging.getLogger(__name__)
 
 def create_graph():
     """
     Creates and compiles the LangGraph state machine for the research assistant.
+    Uses class-based nodes for better modularity and dependency injection.
     """
     logger.info("Initializing StateGraph...")
+    
+    # Initialize Dependencies
+    # In a more advanced setup, these could be passed into create_graph()
+    llm = ChatOllama(model="gemma4:31b-cloud")
+    web_tool = get_web_search_tool()
+    news_tool = get_news_search_tool()
+    
+    # Instantiate Nodes
+    planner = PlannerNode(llm)
+    researcher = ResearcherNode(web_tool, news_tool)
+    reviewer = ReviewerNode(llm)
+    writer = WriterNode(llm)
+    
     workflow = StateGraph(AgentState)
     
-    # Add nodes to the graph
-    workflow.add_node("planner", planner_node)
-    workflow.add_node("researcher", researcher_node)
-    workflow.add_node("reviewer", reviewer_node)
-    workflow.add_node("writer", writer_node)
+    # Add nodes to the graph (callable class instances)
+    workflow.add_node("planner", planner)
+    workflow.add_node("researcher", researcher)
+    workflow.add_node("reviewer", reviewer)
+    workflow.add_node("writer", writer)
     
     # Define the sequential edges
     workflow.add_edge(START, "planner")
