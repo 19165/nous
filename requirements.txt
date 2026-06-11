@@ -2,6 +2,6 @@ discord.py
 langgraph
 langchain
 langchain-community
-langchain-openai
+langchain-ollama
 langchain-tavily
 python-dotenv
