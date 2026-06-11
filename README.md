@@ -1,4 +1,4 @@
-# Discord Research Assistant (v1.1)
+# Discord Research Assistant (v1.2)
 
 Discord Research Assistant is a powerful Discord bot built with **LangGraph** and **LangChain**. It automates the process of researching complex topics by orchestrating a multi-agent workflow to gather, review, and summarize information from web and news sources.
 
@@ -15,14 +15,14 @@ Discord Research Assistant is a powerful Discord bot built with **LangGraph** an
 
 ## 🏗️ Architecture
 
-The system is designed around a shared workflow state (`AgentState`) managed by a LangGraph `StateGraph`.
+The system is designed around a shared workflow state (`AgentState`) managed by a LangGraph `StateGraph`. The agent nodes are implemented as modular, callable classes to support dependency injection and better testability.
 
 ```mermaid
 graph TD
-    START((Start)) --> Planner[Planner Node]
-    Planner --> Researcher[Researcher Node]
-    Researcher --> Reviewer[Reviewer Node]
-    Reviewer --> Writer[Writer Node]
+    START((Start)) --> Planner[PlannerNode]
+    Planner --> Researcher[ResearcherNode]
+    Researcher --> Reviewer[ReviewerNode]
+    Reviewer --> Writer[WriterNode]
     Writer --> END((End))
     
     subgraph Tools
@@ -36,14 +36,14 @@ graph TD
 - **Language:** Python 3.10+
 - **Library:** `discord.py`
 - **AI Framework:** `LangGraph`, `LangChain`
-- **LLM:** OpenAI (GPT-4o)
+- **LLM:** Ollama (Default: `gemma4:31b-cloud`) via `ChatOllama`
 - **Search API:** Tavily
 
 ## 📋 Prerequisites
 
 - Python 3.10 or higher
 - A Discord Bot Token (from [Discord Developer Portal](https://discord.com/developers/applications))
-- An OpenAI API Key
+- [Ollama](https://ollama.com/) installed and running locally or on a server.
 - A Tavily API Key
 
 ## ⚙️ Installation
@@ -67,7 +67,6 @@ graph TD
    Edit `.env`:
    ```env
    DISCORD_TOKEN=your_discord_bot_token
-   OPENAI_API_KEY=your_openai_api_key
    TAVILY_API_KEY=your_tavily_api_key
    ```
 
@@ -88,17 +87,24 @@ graph TD
 
 ```text
 ├── src/
-│   ├── main.py            # Entry point & Bot setup
+│   ├── main.py                # Entry point & Bot setup
 │   ├── bot/
-│   │   └── commands.py    # Discord command handlers
+│   │   └── commands.py        # Discord command handlers
 │   ├── agents/
-│   │   ├── state.py       # LangGraph state definition
-│   │   ├── graph.py       # Workflow orchestration
-│   │   └── nodes.py       # Agent node logic
+│   │   ├── state.py           # LangGraph state definition
+│   │   ├── graph.py           # Workflow orchestration & Dependency Injection
+│   │   └── nodes/             # Modular agent node logic
+│   │       ├── __init__.py    # Node exports
+│   │       ├── planner.py     # PlannerNode class
+│   │       ├── researcher.py  # ResearcherNode class
+│   │       ├── reviewer.py    # ReviewerNode class
+│   │       ├── writer.py      # WriterNode class
+│   │       ├── schemas.py     # Pydantic models & Parsers
+│   │       └── utils.py       # Shared helper functions
 │   └── tools/
-│       └── search.py      # Tavily search integrations
-├── tasks/                 # Development task tracking
-├── docs/                  # PRD and research notes
+│       └── search.py          # Tavily search integrations
+├── tasks/                     # Development task tracking
+├── docs/                      # PRD and research notes
 ├── requirements.txt
 └── .env.example
 ```
