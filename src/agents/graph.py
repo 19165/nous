@@ -67,3 +67,6 @@ async def run_research_workflow(query: str):
     except Exception as e:
         logger.error(f"Error during workflow execution: {e}")
         raise e
+
+# Export the graph for LangGraph Studio
+graph = create_graph()
