@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Optional
+from typing import TypedDict, List, Optional, Any, Dict
 
 class AgentState(TypedDict):
     """
@@ -10,3 +10,10 @@ class AgentState(TypedDict):
     reviewed_findings: List[str]
     summary: Optional[str]
     metadata: dict
+    
+    # --- V2.0 Fields ---
+    retry_count: int
+    plan_history: List[dict]           # Will contain HistoricalPlan dicts
+    reviewer_feedback: Optional[Dict[str, Any]]
+    confidence_scores: Dict[str, int]  # Maps finding content (or ID) to score (0-100)
+    ranked_findings: List[dict]        # Will contain RankedFinding dicts
