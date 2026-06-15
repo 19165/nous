@@ -2,6 +2,7 @@ import logging
 from langchain_core.prompts import ChatPromptTemplate
 from src.agents.state import AgentState
 from .schemas import parser
+from .prompts import PLANNER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -12,30 +13,29 @@ class PlannerNode:
     def __call__(self, state: AgentState):
         """
         Analyzes the user query and generates a structured research plan.
+        Incorporates reviewer feedback if available.
         """
         logger.info("--- Executing Planner Node ---")
         query = state.get("query", "")
+        reviewer_feedback = state.get("reviewer_feedback", {})
+        retry_count = state.get("retry_count", 0)
         format_instructions = parser.get_format_instructions()
 
-        system_prompt = (
-            "You are an expert research planner. Your goal is to break down a complex topic "
-            "into 3-5 logical search steps. \n\n"
-            "{format_instructions}\n\n"
-            "This is tool list that you can use :"
-            "[web_search, news_search]"
-            "EXAMPLE:\n"
-            "User Query: 'Impact of AI on healthcare 2024'\n"
-            "Response:\n"
-            "```json\n"
-            "{{\n"
-            '  "original_query": "Impact of AI on healthcare 2024",\n'
-            '  "steps": [\n'
-            '    {{"task_id": 1, "query": "AI in healthcare trends 2024", "rationale": "Get overview", "tool_name": "web_search"}},\n'
-            '    {{"task_id": 2, "query": "FDA approved AI medical devices 2024", "rationale": "Check regulation", "tool_name": "news_search"}}\n'
-            "  ],\n"
-            '  "estimated_complexity": "Medium"\n'
-            "}}\n"
-            "```"
+        # Add feedback to prompt if this is a retry
+        feedback_prompt = ""
+        if retry_count > 0 and reviewer_feedback:
+            feedback_prompt = (
+                "\n\n--- PREVIOUS ATTEMPT FEEDBACK ---\n"
+                "Your previous research plan was marked as INSUFFICIENT for the following reason:\n"
+                f"{reviewer_feedback.get('reason', 'N/A')}\n"
+                "Please generate a REVISED plan that specifically addresses this missing information "
+                "and improves the overall research quality. Avoid repeating unnecessary search steps.\n"
+                "-----------------------------------\n"
+            )
+
+        system_prompt = PLANNER_SYSTEM_PROMPT.format(
+            format_instructions=format_instructions,
+            feedback_prompt=feedback_prompt
         )
 
         prompt = ChatPromptTemplate.from_messages(

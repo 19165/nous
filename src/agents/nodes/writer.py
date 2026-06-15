@@ -1,5 +1,6 @@
 import logging
 from src.agents.state import AgentState
+from .prompts import WRITER_SYSTEM_PROMPT, WRITER_USER_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
@@ -9,24 +10,29 @@ class WriterNode:
 
     def __call__(self, state: AgentState):
         """
-        Generates the final TL;DR summary for Discord.
+        Generates the final report for Discord using ranked findings.
         """
         logger.info("--- Executing Writer Node ---")
         query = state.get("query", "")
-        reviewed_findings = state.get("reviewed_findings", [])
+        # Use ranked findings for better quality
+        ranked_findings = state.get("ranked_findings", [])
+        
+        findings_text = ""
+        if ranked_findings:
+            findings_text = "\n".join([
+                f"- [{f.get('source_type', 'Unknown')}] {f.get('content')} (Confidence: {f.get('confidence_score')})" 
+                for f in ranked_findings
+            ])
+        else:
+            # Fallback to reviewed_findings if ranked_findings not available
+            reviewed_findings = state.get("reviewed_findings", [])
+            findings_text = "\n".join(reviewed_findings)
 
-        system_msg = "You are a technical writer. Generate a concise TL;DR summary optimized for Discord (Markdown)."
-        user_msg = (
-            f"Topic: {query}\n\n"
-            f"Reviewed Research:\n" + "\n".join(reviewed_findings) + "\n\n"
-            "Please format your response exactly as follows:\n"
-            "## Topic: [Topic Name]\n"
-            "### Key Findings\n"
-            "[Bullet points of key findings]\n\n"
-            "### TL;DR Summary\n"
-            "[3-5 high-level bullet points summary]"
+        user_msg = WRITER_USER_TEMPLATE.format(
+            query=query,
+            findings_text=findings_text
         )
 
-        messages = [("system", system_msg), ("human", user_msg)]
+        messages = [("system", WRITER_SYSTEM_PROMPT), ("human", user_msg)]
         response = self.llm.invoke(messages)
         return {"summary": response.content}

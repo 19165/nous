@@ -1,6 +1,7 @@
 import logging
 from src.agents.state import AgentState
 from src.agents.nodes.schemas import reviewer_parser
+from .prompts import REVIEWER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +19,8 @@ class ReviewerNode:
         findings = state.get("findings", [])
         current_retry = state.get("retry_count", 0)
 
-        system_msg = (
-            "You are an expert Research Reviewer. Your task is to evaluate the collected findings "
-            "based on the original research query. \n\n"
-            "Guidelines:\n"
-            "1. Assess if the findings sufficiently answer the query. If not, mark as INSUFFICIENT and provide specific feedback.\n"
-            "2. For each finding, identify the source type and assign a confidence score (0-100).\n"
-            "3. Source Ranking Priority: Official > News > Academic > Blog > Opinion > Unknown.\n"
-            "4. Provide a structured response including your decision, detailed feedback, and a list of ranked findings.\n\n"
-            f"{reviewer_parser.get_format_instructions()}"
+        system_msg = REVIEWER_SYSTEM_PROMPT.format(
+            format_instructions=reviewer_parser.get_format_instructions()
         )
 
         user_msg = f"Original Query: {query}\nIteration: {current_retry}\n\nFindings gathered so far:\n" + "\n".join(findings)
