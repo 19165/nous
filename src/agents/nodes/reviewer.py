@@ -45,13 +45,15 @@ class ReviewerNode:
                 "decision": output.decision,
                 "ranked_findings": ranked_dicts,
                 "confidence_scores": conf_scores,
-                "reviewed_findings": [rf.content for rf in output.ranked_findings]
+                "reviewed_findings": [rf.content for rf in output.ranked_findings],
+                "retry_count": current_retry + 1
             }
         except Exception as e:
             logger.error(f"Error parsing reviewer output: {e}")
             # Fallback if parsing fails
             return {
                 "decision": "SUFFICIENT", 
-                "reviewer_feedback": {"reason": "Error in parsing, defaulting to sufficient."}
+                "reviewer_feedback": {"reason": "Error in parsing, defaulting to sufficient."},
+                "retry_count": current_retry + 1
             }
 

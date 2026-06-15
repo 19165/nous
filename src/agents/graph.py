@@ -7,6 +7,26 @@ from src.tools.search import get_web_search_tool, get_news_search_tool
 
 logger = logging.getLogger(__name__)
 
+def route_after_reviewer(state: AgentState):
+    """
+    Routes the workflow based on the Reviewer's decision and retry count.
+    """
+    decision = state.get("decision", "SUFFICIENT")
+    retry_count = state.get("retry_count", 0)
+    # Configure retry limit
+    MAX_RETRIES = 3 
+    
+    if decision == "INSUFFICIENT" and retry_count < MAX_RETRIES:
+        logger.info(f"Decision is INSUFFICIENT. Retrying... (Attempt {retry_count} of {MAX_RETRIES})")
+        return "planner"
+    
+    if retry_count >= MAX_RETRIES:
+        logger.warning(f"Max retries ({MAX_RETRIES}) reached. Proceeding to writer.")
+    else:
+        logger.info("Decision is SUFFICIENT. Proceeding to writer.")
+        
+    return "writer"
+
 def create_graph():
     """
     Creates and compiles the LangGraph state machine for the research assistant.
@@ -15,7 +35,6 @@ def create_graph():
     logger.info("Initializing StateGraph...")
     
     # Initialize Dependencies
-    # In a more advanced setup, these could be passed into create_graph()
     llm = ChatOllama(model="gemma4:31b-cloud")
     web_tool = get_web_search_tool()
     news_tool = get_news_search_tool()
@@ -38,7 +57,17 @@ def create_graph():
     workflow.add_edge(START, "planner")
     workflow.add_edge("planner", "researcher")
     workflow.add_edge("researcher", "reviewer")
-    workflow.add_edge("reviewer", "writer")
+    
+    # Define conditional edges from reviewer
+    workflow.add_conditional_edges(
+        "reviewer",
+        route_after_reviewer,
+        {
+            "planner": "planner",
+            "writer": "writer"
+        }
+    )
+    
     workflow.add_edge("writer", END)
     
     # Compile the workflow into a runnable app
@@ -57,7 +86,12 @@ async def run_research_workflow(query: str):
         "findings": [],
         "reviewed_findings": [],
         "summary": None,
-        "metadata": {}
+        "metadata": {},
+        "retry_count": 0,
+        "plan_history": [],
+        "reviewer_feedback": None,
+        "confidence_scores": {},
+        "ranked_findings": []
     }
     
     try:
