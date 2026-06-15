@@ -1,4 +1,5 @@
 import logging
+from langchain_core.prompts import ChatPromptTemplate
 from src.agents.state import AgentState
 from src.agents.nodes.schemas import reviewer_parser
 from .prompts import REVIEWER_SYSTEM_PROMPT
@@ -19,18 +20,23 @@ class ReviewerNode:
         findings = state.get("findings", [])
         current_retry = state.get("retry_count", 0)
 
-        system_msg = REVIEWER_SYSTEM_PROMPT.format(
-            format_instructions=reviewer_parser.get_format_instructions()
-        )
+        # Use ChatPromptTemplate to avoid manual formatting errors
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", REVIEWER_SYSTEM_PROMPT),
+            ("human", "Original Query: {query}\nIteration: {retry}\n\nFindings gathered so far:\n{findings}")
+        ])
 
-        user_msg = f"Original Query: {query}\nIteration: {current_retry}\n\nFindings gathered so far:\n" + "\n".join(findings)
-
-        messages = [("system", system_msg), ("human", user_msg)]
-        
-        # Invoke LLM with structured output guidance
-        response = self.llm.invoke(messages)
+        chain = prompt | self.llm
         
         try:
+            # Invoke LLM with structured output guidance handled by LangChain
+            response = chain.invoke({
+                "query": query,
+                "retry": current_retry,
+                "findings": "\n".join(findings),
+                "format_instructions": reviewer_parser.get_format_instructions()
+            })
+            
             # Parse the structured output
             output = reviewer_parser.parse(response.content)
             

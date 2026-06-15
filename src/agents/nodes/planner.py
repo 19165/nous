@@ -33,20 +33,20 @@ class PlannerNode:
                 "-----------------------------------\n"
             )
 
-        system_prompt = PLANNER_SYSTEM_PROMPT.format(
-            format_instructions=format_instructions,
-            feedback_prompt=feedback_prompt
-        )
-
         prompt = ChatPromptTemplate.from_messages(
-            [("system", system_prompt), ("human", "Research Topic: {query}")]
+            [("system", PLANNER_SYSTEM_PROMPT), ("human", "Research Topic: {query}")]
         )
 
         chain = prompt | self.llm
 
         try:
+            # Pass all variables to invoke so LangChain handles formatting once
             response = chain.invoke(
-                {"query": query, "format_instructions": format_instructions}
+                {
+                    "query": query, 
+                    "format_instructions": format_instructions,
+                    "feedback_prompt": feedback_prompt
+                }
             )
 
             content = response.content
