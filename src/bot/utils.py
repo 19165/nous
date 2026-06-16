@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,6 +13,7 @@ class ProgressManager:
         iteration = state.get("current_iteration", 1)
         max_iter = state.get("max_iterations", 3)
         status = state.get("workflow_status", "in_progress")
+        timestamp = datetime.now().strftime("%H:%M:%S")
         
         # Select emoji based on the stage
         emoji = "⏳"
@@ -30,4 +32,8 @@ class ProgressManager:
         if status == "failed":
             return "❌ **Research Failed.** Something went wrong during the process."
 
-        return f"[{emoji}] **Current Stage:** {stage}\n🔄 **Iteration:** {iteration}/{max_iter}"
+        return (
+            f"> {emoji} **Current Stage:** {stage}\n"
+            f"> 🔄 **Iteration:** {iteration}/{max_iter}\n"
+            f"> ⏱️ *Last updated at: {timestamp}*"
+        )
