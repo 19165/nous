@@ -32,6 +32,9 @@ class RankedFinding(BaseModel):
 
 class ReviewerOutput(BaseModel):
     """The main output from the Reviewer Node."""
+    reasoning: str = Field(
+        description="Step-by-step Gap Analysis. Compare 'User Needs' vs 'Collected Findings' to identify what is missing."
+    )
     decision: Literal["SUFFICIENT", "INSUFFICIENT"] = Field(
         description="Whether the research objective has been sufficiently addressed."
     )

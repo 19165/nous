@@ -47,7 +47,10 @@ class ReviewerNode:
             ranked_dicts = [rf.model_dump() for rf in output.ranked_findings]
 
             return {
-                "reviewer_feedback": {"reason": output.feedback},
+                "reviewer_feedback": {
+                    "reason": output.feedback,
+                    "reasoning": output.reasoning # Store the CoT reasoning
+                },
                 "decision": output.decision,
                 "ranked_findings": ranked_dicts,
                 "confidence_scores": conf_scores,
