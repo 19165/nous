@@ -107,5 +107,35 @@ async def run_research_workflow(query: str):
         logger.error(f"Error during workflow execution: {e}")
         raise e
 
+async def stream_research_workflow(query: str):
+    """
+    A generator that yields state updates from the research graph.
+    """
+    logger.info(f"Streaming research workflow for query: {query}")
+    app = create_graph()
+    
+    initial_state = {
+        "query": query,
+        "plan": None,
+        "findings": [],
+        "reviewed_findings": [],
+        "summary": None,
+        "metadata": {},
+        "retry_count": 0,
+        "plan_history": [],
+        "reviewer_feedback": None,
+        "confidence_scores": {},
+        "ranked_findings": [],
+        # --- V2.1 Progress Tracking ---
+        "progress_stage": "Starting research...",
+        "current_iteration": 1,
+        "max_iterations": 3,
+        "workflow_status": "in_progress"
+    }
+
+    # Stream events from the graph
+    async for event in app.astream(initial_state, stream_mode="values"):
+        yield event
+
 # Export the graph for LangGraph Studio
 graph = create_graph()
