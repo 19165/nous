@@ -56,7 +56,10 @@ class PlannerNode:
                 content = content.split("```")[1].split("```")[0].strip()
 
             plan = parser.parse(content)
-            return {"plan": plan.model_dump()}
+            return {
+                "plan": plan.model_dump(),
+                "progress_stage": "Planning research"
+            }
 
         except Exception as e:
             logger.error(f"Planner Node parsing failed: {e}")
@@ -72,4 +75,7 @@ class PlannerNode:
                 ],
                 "estimated_complexity": "Unknown",
             }
-            return {"plan": fallback_plan}
+            return {
+                "plan": fallback_plan,
+                "progress_stage": "Planning research (using fallback)"
+            }

@@ -35,4 +35,8 @@ class WriterNode:
 
         messages = [("system", WRITER_SYSTEM_PROMPT), ("human", user_msg)]
         response = self.llm.invoke(messages)
-        return {"summary": response.content}
+        return {
+            "summary": response.content,
+            "progress_stage": "Writing report",
+            "workflow_status": "completed"
+        }

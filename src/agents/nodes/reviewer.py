@@ -55,7 +55,9 @@ class ReviewerNode:
                 "ranked_findings": ranked_dicts,
                 "confidence_scores": conf_scores,
                 "reviewed_findings": [rf.content for rf in output.ranked_findings],
-                "retry_count": current_retry + 1
+                "retry_count": current_retry + 1,
+                "progress_stage": f"Reviewing findings (Iteration {current_retry + 1} of {state.get('max_iterations', 3)})",
+                "current_iteration": current_retry + 1
             }
         except Exception as e:
             logger.error(f"Error parsing reviewer output: {e}")
@@ -63,6 +65,8 @@ class ReviewerNode:
             return {
                 "decision": "SUFFICIENT", 
                 "reviewer_feedback": {"reason": "Error in parsing, defaulting to sufficient."},
-                "retry_count": current_retry + 1
+                "retry_count": current_retry + 1,
+                "progress_stage": f"Reviewing findings (Iteration {current_retry + 1} of {state.get('max_iterations', 3)})",
+                "current_iteration": current_retry + 1
             }
 

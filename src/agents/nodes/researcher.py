@@ -43,4 +43,7 @@ class ResearcherNode:
             logger.warning("No findings were generated from search steps.")
             all_findings = ["No search results found for the given queries."]
 
-        return {"findings": all_findings}
+        return {
+            "findings": all_findings,
+            "progress_stage": f"Finished gathering information from {len(steps)} planned search steps"
+        }
