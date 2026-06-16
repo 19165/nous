@@ -1,28 +1,31 @@
-# Discord Research Assistant (v1.2)
+# Discord Research Assistant (v2.1)
 
 Discord Research Assistant is a powerful Discord bot built with **LangGraph** and **LangChain**. It automates the process of researching complex topics by orchestrating a multi-agent workflow to gather, review, and summarize information from web and news sources.
 
 ## 🚀 Features
 
 - **Slash Command:** Start research tasks directly from Discord using `/research [topic]`.
+- **Real-time Progress Streaming:** Watch the assistant work in real-time with live status updates and iteration tracking directly in Discord.
+- **Iterative Research Loop:** Advanced logic that allows the system to identify information gaps and re-plan research up to 3 times to ensure high-quality findings.
+- **Skeptical Senior Reviewer:** A specialized agent persona that performs rigorous gap analysis and source quality ranking (Official > News > Academic > Blogs).
 - **Multi-Agent Workflow:** Utilizes a stateful orchestration of specialized AI agents:
-  - **Planner:** Analyzes the query and generates research objectives.
+  - **Planner:** Generates and refines research strategies based on feedback.
   - **Researcher:** Gathers data using advanced web and news search tools.
-  - **Reviewer:** Filters findings for relevance and completeness.
-  - **Writer:** Synthesizes findings into a concise, Discord-optimized TL;DR summary.
-- **Stateful Design:** Managed workflow state using LangGraph for transparent and observable transitions.
-- **Tavily Integration:** Specialized tools for high-quality web and news search results.
+  - **Reviewer:** Performs deep quality assessment and source ranking.
+  - **Writer:** Synthesizes findings into a concise, Discord-optimized report with confidence summaries.
+- **Optimized Interaction:** Fixed "Unknown Interaction" errors using asynchronous event streaming and immediate response deferral.
 
 ## 🏗️ Architecture
 
-The system is designed around a shared workflow state (`AgentState`) managed by a LangGraph `StateGraph`. The agent nodes are implemented as modular, callable classes to support dependency injection and better testability.
+The system is designed around a shared workflow state (`AgentState`) managed by a LangGraph `StateGraph`. The workflow now includes a conditional retry loop for higher research quality.
 
 ```mermaid
 graph TD
     START((Start)) --> Planner[PlannerNode]
     Planner --> Researcher[ResearcherNode]
     Researcher --> Reviewer[ReviewerNode]
-    Reviewer --> Writer[WriterNode]
+    Reviewer -- "Insufficient / Retry" --> Planner
+    Reviewer -- "Sufficient / Max Retries" --> Writer[WriterNode]
     Writer --> END((End))
     
     subgraph Tools
@@ -89,7 +92,8 @@ graph TD
 ├── src/
 │   ├── main.py                # Entry point & Bot setup
 │   ├── bot/
-│   │   └── commands.py        # Discord command handlers
+│   │   ├── commands.py        # Discord command handlers
+│   │   └── utils.py           # Progress management & Formatting
 │   ├── agents/
 │   │   ├── state.py           # LangGraph state definition
 │   │   ├── graph.py           # Workflow orchestration & Dependency Injection
