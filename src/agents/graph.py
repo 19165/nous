@@ -91,7 +91,12 @@ async def run_research_workflow(query: str):
         "plan_history": [],
         "reviewer_feedback": None,
         "confidence_scores": {},
-        "ranked_findings": []
+        "ranked_findings": [],
+        # --- V2.1 Progress Tracking ---
+        "progress_stage": "Starting research...",
+        "current_iteration": 1,
+        "max_iterations": 3,
+        "workflow_status": "in_progress"
     }
     
     try:

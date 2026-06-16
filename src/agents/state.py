@@ -17,3 +17,9 @@ class AgentState(TypedDict):
     reviewer_feedback: Optional[Dict[str, Any]]
     confidence_scores: Dict[str, int]  # Maps finding content (or ID) to score (0-100)
     ranked_findings: List[dict]        # Will contain RankedFinding dicts
+
+    # --- V2.1 Progress Tracking ---
+    progress_stage: str       # Current stage description
+    current_iteration: int    # Current research iteration (starts at 1)
+    max_iterations: int       # Maximum allowed iterations
+    workflow_status: str      # 'in_progress', 'completed', or 'failed'
