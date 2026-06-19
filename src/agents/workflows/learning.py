@@ -11,6 +11,7 @@ def route_after_reviewer(state: AgentState):
     """
     decision = state.get("decision", "SUFFICIENT")
     retry_count = state.get("retry_count", 0)
+    print(f"\nDEBUG ROUTING STATE: decision={decision}, retry_count={retry_count}\n")
     MAX_RETRIES = settings.MAX_RETRIES
     
     if decision == "INSUFFICIENT" and retry_count < MAX_RETRIES:

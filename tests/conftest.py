@@ -8,6 +8,8 @@ from langchain_core.messages import AIMessage
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from src.agents.schemas import ClassifierOutput, ResearchPlan, ReviewerOutput
+import src
+print(f"\nDEBUG IMPORT SRC PATH: {src.__file__}\n")
 
 class MockLLM:
     def __init__(self):
@@ -18,10 +20,44 @@ class MockLLM:
         return self.invoke(*args, **kwargs)
 
     def invoke(self, messages, *args, **kwargs):
-        return AIMessage(content=self.response_content)
+        print(f"\nDEBUG CONFTEST LLM: id={id(self)}, custom_invoke={getattr(self, 'custom_invoke', None)}\n", flush=True)
+        if getattr(self, "custom_invoke", None) is not None:
+            return self.custom_invoke(messages, *args, **kwargs)
+            
+        msg_str = str(messages).lower()
+        
+        # Check if PlannerNode is invoking
+        if "research planner" in msg_str or "estimated_complexity" in msg_str or "original_query" in msg_str:
+            return AIMessage(content='''{
+                "original_query": "Test query",
+                "steps": [
+                    {"task_id": 1, "query": "mocked search query", "rationale": "test", "tool_name": "web_search"}
+                ],
+                "estimated_complexity": "Low"
+            }''')
+            
+        # Check if ReviewerNode is invoking
+        if "skeptical" in msg_str or "gap analysis" in msg_str or "decision criteria" in msg_str:
+            if not hasattr(self, "_reviewer_calls"):
+                self._reviewer_calls = 0
+            self._reviewer_calls += 1
+            
+            # Toggle decision for testing retry loop (1st: INSUFFICIENT, 2nd: SUFFICIENT)
+            decision = "INSUFFICIENT" if self._reviewer_calls == 1 else "SUFFICIENT"
+            feedback = "Need more code details" if decision == "INSUFFICIENT" else ""
+            
+            return AIMessage(content=f'''{{
+                "reasoning": "Mock gap analysis",
+                "decision": "{decision}",
+                "feedback": "{feedback}",
+                "ranked_findings": []
+            }}''')
+
+        # Fallback for WriterNode or other invocations
+        return AIMessage(content=self.response_content or "Mocked default response")
 
     async def ainvoke(self, messages, *args, **kwargs):
-        return AIMessage(content=self.response_content)
+        return self.invoke(messages, *args, **kwargs)
 
     def with_structured_output(self, schema, *args, **kwargs):
         mock_chain = MagicMock()

@@ -26,3 +26,5 @@ class AgentState(TypedDict):
 
     # --- V2.2 Adaptive Routing ---
     query_type: Optional[Literal["NEWS", "LEARNING", "COMPARISON", "UNKNOWN"]]
+    decision: Optional[Literal["SUFFICIENT", "INSUFFICIENT"]]
+

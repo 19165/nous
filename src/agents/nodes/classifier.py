@@ -17,7 +17,7 @@ class ClassifierNode:
         logger.info("--- Executing Classifier Node ---")
         query = state.get("query", "")
 
-        system_prompt = load_prompt("classifier_system.txt")
+        system_prompt = load_prompt("classifier/system.txt")
 
         prompt = ChatPromptTemplate.from_messages(
             [("system", system_prompt), ("human", "User Query: {query}")]

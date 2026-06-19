@@ -1,0 +1,15 @@
+Topic: {query}
+
+Reviewed Research Findings:
+{findings_text}
+
+Please format your response exactly as follows:
+## Topic: {query}
+### Key Findings
+[List of findings ordered by source quality]
+
+### Confidence Summary
+[Explain the overall confidence level and any uncertainties]
+
+### TL;DR Summary
+[3-5 high-level bullet points summary]

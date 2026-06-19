@@ -16,6 +16,7 @@ class PlannerNode:
         Incorporates reviewer feedback if available.
         """
         logger.info("--- Executing Planner Node ---")
+        print(f"\nDEBUG PLANNER LLM: id={id(self.llm)}, class={self.llm.__class__.__name__}\n")
         query = state.get("query", "")
         reviewer_feedback = state.get("reviewer_feedback", {})
         retry_count = state.get("retry_count", 0)
@@ -37,13 +38,13 @@ class PlannerNode:
         query_type = state.get("query_type", "UNKNOWN")
         logger.info(f"[Planner Node] Loading prompt strategy for query_type: {query_type}")
         if query_type == "NEWS":
-            system_prompt_template = load_prompt("planner_news_system.txt")
+            system_prompt_template = load_prompt("planner/news.txt")
         elif query_type == "LEARNING":
-            system_prompt_template = load_prompt("planner_learning_system.txt")
+            system_prompt_template = load_prompt("planner/learning.txt")
         elif query_type == "COMPARISON":
-            system_prompt_template = load_prompt("planner_comparison_system.txt")
+            system_prompt_template = load_prompt("planner/comparison.txt")
         else:
-            system_prompt_template = load_prompt("planner_general_system.txt")
+            system_prompt_template = load_prompt("planner/general.txt")
 
         prompt = ChatPromptTemplate.from_messages(
             [("system", system_prompt_template), ("human", "Research Topic: {query}")]

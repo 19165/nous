@@ -15,11 +15,23 @@ class ReviewerNode:
         Assigns confidence scores and ranks findings by source quality.
         """
         logger.info("--- Executing Reviewer Node ---")
+        print(f"\nDEBUG REVIEWER LLM: id={id(self.llm)}, class={self.llm.__class__.__name__}\n")
         query = state.get("query", "")
         findings = state.get("findings", [])
         current_retry = state.get("retry_count", 0)
 
-        system_prompt = load_prompt("reviewer_system.txt")
+        # Determine the appropriate reviewer system prompt based on query_type
+        query_type = state.get("query_type", "UNKNOWN")
+        logger.info(f"[Reviewer Node] Loading prompt strategy for query_type: {query_type}")
+        if query_type == "NEWS":
+            system_prompt = load_prompt("reviewer/v2_news.txt")
+        elif query_type == "LEARNING":
+            system_prompt = load_prompt("reviewer/v2_learning.txt")
+        elif query_type == "COMPARISON":
+            system_prompt = load_prompt("reviewer/v2_comparison.txt")
+        else:
+            system_prompt = load_prompt("reviewer/v2_general.txt")
+
         # Use ChatPromptTemplate to avoid manual formatting errors
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
