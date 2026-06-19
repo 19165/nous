@@ -1,6 +1,7 @@
 import logging
 from src.agents.schemas import AgentState
-from .prompts import WRITER_SYSTEM_PROMPT, WRITER_USER_TEMPLATE
+from src.agents.prompts import load_prompt
+from .prompts import WRITER_USER_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,8 @@ class WriterNode:
             findings_text=findings_text
         )
 
-        messages = [("system", WRITER_SYSTEM_PROMPT), ("human", user_msg)]
+        system_prompt = load_prompt("writer_system.txt")
+        messages = [("system", system_prompt), ("human", user_msg)]
         response = self.llm.invoke(messages)
         return {
             "summary": response.content,

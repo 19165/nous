@@ -1,7 +1,7 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
 from src.agents.schemas import AgentState, reviewer_parser
-from .prompts import REVIEWER_SYSTEM_PROMPT
+from src.agents.prompts import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,10 @@ class ReviewerNode:
         findings = state.get("findings", [])
         current_retry = state.get("retry_count", 0)
 
+        system_prompt = load_prompt("reviewer_system.txt")
         # Use ChatPromptTemplate to avoid manual formatting errors
         prompt = ChatPromptTemplate.from_messages([
-            ("system", REVIEWER_SYSTEM_PROMPT),
+            ("system", system_prompt),
             ("human", "Original Query: {query}\nIteration: {retry}\n\nFindings gathered so far:\n{findings}")
         ])
 

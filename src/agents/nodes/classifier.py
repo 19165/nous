@@ -1,7 +1,7 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
 from src.agents.schemas import AgentState, ClassifierOutput, classifier_parser
-from .prompts import CLASSIFIER_SYSTEM_PROMPT
+from src.agents.prompts import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +17,10 @@ class ClassifierNode:
         logger.info("--- Executing Classifier Node ---")
         query = state.get("query", "")
 
+        system_prompt = load_prompt("classifier_system.txt")
+
         prompt = ChatPromptTemplate.from_messages(
-            [("system", CLASSIFIER_SYSTEM_PROMPT), ("human", "User Query: {query}")]
+            [("system", system_prompt), ("human", "User Query: {query}")]
         )
 
         # Try structured output first
@@ -55,7 +57,7 @@ class ClassifierNode:
                     [
                         (
                             "system",
-                            CLASSIFIER_SYSTEM_PROMPT + "\n\n{format_instructions}",
+                            system_prompt + "\n\n{format_instructions}",
                         ),
                         ("human", "User Query: {query}"),
                     ]

@@ -1,8 +1,7 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
-from src.agents.state import AgentState
-from .schemas import parser
-from .prompts import PLANNER_SYSTEM_PROMPT
+from src.agents.schemas import AgentState, parser
+from src.agents.prompts import load_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +33,20 @@ class PlannerNode:
                 "-----------------------------------\n"
             )
 
+        # Determine the appropriate planner system prompt based on query_type
+        query_type = state.get("query_type", "UNKNOWN")
+        logger.info(f"[Planner Node] Loading prompt strategy for query_type: {query_type}")
+        if query_type == "NEWS":
+            system_prompt_template = load_prompt("planner_news_system.txt")
+        elif query_type == "LEARNING":
+            system_prompt_template = load_prompt("planner_learning_system.txt")
+        elif query_type == "COMPARISON":
+            system_prompt_template = load_prompt("planner_comparison_system.txt")
+        else:
+            system_prompt_template = load_prompt("planner_general_system.txt")
+
         prompt = ChatPromptTemplate.from_messages(
-            [("system", PLANNER_SYSTEM_PROMPT), ("human", "Research Topic: {query}")]
+            [("system", system_prompt_template), ("human", "Research Topic: {query}")]
         )
 
         chain = prompt | self.llm
