@@ -1,7 +1,6 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
-from src.agents.state import AgentState
-from src.agents.nodes.schemas import reviewer_parser
+from src.agents.schemas import AgentState, reviewer_parser
 from .prompts import REVIEWER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)

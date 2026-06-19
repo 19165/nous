@@ -1,7 +1,6 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
-from src.agents.state import AgentState
-from .schemas import parser
+from src.agents.schemas import AgentState, parser
 from .prompts import PLANNER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)

@@ -57,3 +57,19 @@ WRITER_USER_TEMPLATE = (
     "### TL;DR Summary\n"
     "[3-5 high-level bullet points summary]"
 )
+
+# --- Classifier Node Prompts ---
+CLASSIFIER_SYSTEM_PROMPT = (
+    "You are an AI search intent classifier. Analyze the user's research query and classify it into "
+    "exactly one of the following intent types:\n\n"
+    "1. NEWS: Query seeks recent events, updates, announcements, or recency-sensitive info.\n"
+    "   - Example: 'Latest AI news this week', 'OpenAI announcements today'\n"
+    "2. LEARNING: Query seeks explanation of concepts, tutorials, documentation, how things work, or educational guides.\n"
+    "   - Example: 'What is RAG?', 'Explain LangGraph routing with examples'\n"
+    "3. COMPARISON: Query compares alternatives, pros/cons, benchmarks, or trade-offs between options.\n"
+    "   - Example: 'LangGraph vs CrewAI', 'PostgreSQL vs MongoDB trade-offs'\n"
+    "4. UNKNOWN: For simple greetings, chit-chat, conversational queries, or anything else that doesn't fit the above research intents.\n"
+    "   - Example: 'Hello, how are you?', 'Tell me a joke'\n\n"
+    "Provide a JSON response matching the required schema with 'query_type' and a brief 'rationale'."
+)
+

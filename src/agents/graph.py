@@ -1,7 +1,7 @@
 import logging
 from langgraph.graph import StateGraph, START, END
 from langchain_ollama import ChatOllama
-from src.agents.state import AgentState
+from src.agents.schemas import AgentState
 from src.agents.nodes import PlannerNode, ResearcherNode, ReviewerNode, WriterNode
 from src.tools.search import get_web_search_tool, get_news_search_tool
 
@@ -96,7 +96,9 @@ async def run_research_workflow(query: str):
         "progress_stage": "Starting research...",
         "current_iteration": 1,
         "max_iterations": 3,
-        "workflow_status": "in_progress"
+        "workflow_status": "in_progress",
+        # --- V2.2 Adaptive Routing ---
+        "query_type": "UNKNOWN"
     }
     
     try:
@@ -130,7 +132,9 @@ async def stream_research_workflow(query: str):
         "progress_stage": "Starting research...",
         "current_iteration": 1,
         "max_iterations": 3,
-        "workflow_status": "in_progress"
+        "workflow_status": "in_progress",
+        # --- V2.2 Adaptive Routing ---
+        "query_type": "UNKNOWN"
     }
 
     # Stream events from the graph

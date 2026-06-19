@@ -1,5 +1,5 @@
 import logging
-from src.agents.state import AgentState
+from src.agents.schemas import AgentState
 from .prompts import WRITER_SYSTEM_PROMPT, WRITER_USER_TEMPLATE
 
 logger = logging.getLogger(__name__)

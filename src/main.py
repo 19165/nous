@@ -2,23 +2,21 @@ import os
 import logging
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
-
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+from src.config.settings import settings
+
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
+    level=settings.LOG_LEVEL,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("bot.log"), logging.StreamHandler()],
+    handlers=[logging.FileHandler(settings.LOG_FILE), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = settings.DISCORD_TOKEN
 
 
 class ResearchBot(commands.Bot):

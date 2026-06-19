@@ -1,5 +1,5 @@
 import logging
-from src.agents.state import AgentState
+from src.agents.schemas import AgentState
 from .utils import process_results
 
 logger = logging.getLogger(__name__)

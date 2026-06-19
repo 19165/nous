@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Optional, Any, Dict
+from typing import TypedDict, List, Optional, Any, Dict, Literal
 
 class AgentState(TypedDict):
     """
@@ -23,3 +23,6 @@ class AgentState(TypedDict):
     current_iteration: int    # Current research iteration (starts at 1)
     max_iterations: int       # Maximum allowed iterations
     workflow_status: str      # 'in_progress', 'completed', or 'failed'
+
+    # --- V2.2 Adaptive Routing ---
+    query_type: Optional[Literal["NEWS", "LEARNING", "COMPARISON", "UNKNOWN"]]

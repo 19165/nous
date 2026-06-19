@@ -45,6 +45,16 @@ class ReviewerOutput(BaseModel):
         description="List of findings ordered by source quality (Official > News > Academic > Blog > Opinion)."
     )
 
-# Initialize Parser
+class ClassifierOutput(BaseModel):
+    """The output from the Classifier Node."""
+    query_type: Literal["NEWS", "LEARNING", "COMPARISON", "UNKNOWN"] = Field(
+        description="The identified intent of the user's research query."
+    )
+    rationale: str = Field(
+        description="Brief explanation of why this query type was selected."
+    )
+
+# Initialize Parsers
 parser = PydanticOutputParser(pydantic_object=ResearchPlan)
 reviewer_parser = PydanticOutputParser(pydantic_object=ReviewerOutput)
+classifier_parser = PydanticOutputParser(pydantic_object=ClassifierOutput)
