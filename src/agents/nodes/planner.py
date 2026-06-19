@@ -1,9 +1,11 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
-from src.agents.schemas import AgentState, parser
+from src.agents.state import AgentState
+from .schemas import parser
 from .prompts import PLANNER_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
+
 
 class PlannerNode:
     def __init__(self, llm):
@@ -42,9 +44,9 @@ class PlannerNode:
             # Pass all variables to invoke so LangChain handles formatting once
             response = chain.invoke(
                 {
-                    "query": query, 
+                    "query": query,
                     "format_instructions": format_instructions,
-                    "feedback_prompt": feedback_prompt
+                    "feedback_prompt": feedback_prompt,
                 }
             )
 
@@ -55,10 +57,7 @@ class PlannerNode:
                 content = content.split("```")[1].split("```")[0].strip()
 
             plan = parser.parse(content)
-            return {
-                "plan": plan.model_dump(),
-                "progress_stage": "Planning research"
-            }
+            return {"plan": plan.model_dump(), "progress_stage": "Planning research"}
 
         except Exception as e:
             logger.error(f"Planner Node parsing failed: {e}")
@@ -76,5 +75,5 @@ class PlannerNode:
             }
             return {
                 "plan": fallback_plan,
-                "progress_stage": "Planning research (using fallback)"
+                "progress_stage": "Planning research (using fallback)",
             }
